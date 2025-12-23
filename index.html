@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="fa" dir="rtl" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>آزمون فارسی نوبت اول</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap');
+    
+    * {
+      font-family: 'Vazirmatn', sans-serif;
+    }
+    
+    .question-card {
+      transition: all 0.3s ease;
+    }
+    
+    .question-card:hover {
+      transform: translateY(-2px);
+    }
+    
+    .option-button {
+      transition: all 0.2s ease;
+    }
+    
+    .option-button:hover:not(.correct):not(.incorrect) {
+      transform: scale(1.02);
+    }
+    
+    .correct {
+      animation: correctPulse 0.5s ease;
+    }
+    
+    .incorrect {
+      animation: shake 0.5s ease;
+    }
+    
+    @keyframes correctPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ </head>
+ <body class="h-full">
+  <div id="app" class="h-full w-full overflow-auto"></div>
+  <script>
+    const defaultConfig = {
+      background_color: '#f0f4f8',
+      surface_color: '#ffffff',
+      text_color: '#1a202c',
+      primary_action_color: '#3b82f6',
+      secondary_action_color: '#10b981',
+      font_family: 'Vazirmatn',
+      font_size: 16,
+      site_title: 'آزمون فارسی نوبت اول - کلاس هشتم',
+      welcome_message: 'آزمون درس فارسی نوبت اول (تا پایان درس ۴)',
+      start_button: 'شروع آزمون',
+      submit_button: 'ثبت پاسخ‌ها',
+      retry_button: 'آزمون مجدد'
+    };
+
+    const questions = [
+      {
+        id: 1,
+        text: 'درس اول «آیینه‌ی دار» نوشته کیست؟',
+        options: ['جلال آل احمد', 'احمد محمود', 'هوشنگ مرادی کرمانی', 'محمدعلی جمالزاده'],
+        correct: 2
+      },
+      {
+        id: 2,
+        text: 'در جمله «کتاب را خواندم» کلمه «را» چه نقشی دارد؟',
+        options: ['نشانه مفعول', 'حرف اضافه', 'حرف ربط', 'نشانه فاعل'],
+        correct: 0
+      },
+      {
+        id: 3,
+        text: 'کدام گزینه فعل امر است؟',
+        options: ['می‌رود', 'بنویس', 'رفته است', 'خواهد رفت'],
+        correct: 1
+      },
+      {
+        id: 4,
+        text: 'درس «ای وای اگر» اثر کیست؟',
+        options: ['مهدی آذری‌زادی', 'احمد شاملو', 'سهراب سپهری', 'فروغ فرخزاد'],
+        correct: 0
+      },
+      {
+        id: 5,
+        text: 'کدام گزینه نمونه‌ای از آرایه تشبیه است؟',
+        options: ['دلم گرفته است', 'چهره‌اش مانند ماه بود', 'باران می‌بارد', 'خورشید طلوع کرد'],
+        correct: 1
+      },
+      {
+        id: 6,
+        text: 'در جمله «علی کتاب می‌خواند» کلمه «علی» چه نقش دستوری دارد؟',
+        options: ['مفعول', 'فاعل', 'متمم', 'مسند'],
+        correct: 1
+      },
+      {
+        id: 7,
+        text: 'واژه «دستان» چه نوع جمعی است؟',
+        options: ['جمع مکسر عربی', 'جمع سالم عربی', 'جمع فارسی', 'جمع شکسته فارسی'],
+        correct: 2
+      },
+      {
+        id: 8,
+        text: 'درس سوم «قدر دانستن» در مورد چه موضوعی است؟',
+        options: ['احترام به بزرگترها', 'شکرگزاری از نعمت‌ها', 'تاریخ ایران', 'علم و دانش'],
+        correct: 1
+      },
+      {
+        id: 9,
+        text: 'کدام گزینه فعل ماضی ساده است؟',
+        options: ['می‌رفت', 'رفته بود', 'رفت', 'خواهد رفت'],
+        correct: 2
+      },
+      {
+        id: 10,
+        text: 'واژه «دانشگاه» چه نوع ساخت واژه‌ای دارد؟',
+        options: ['ساده', 'مرکب', 'مشتق', 'وامی'],
+        correct: 1
+      },
+      {
+        id: 11,
+        text: 'کدام واژه مترادف «شادمانی» است؟',
+        options: ['اندوه', 'خوشی', 'نگرانی', 'ترس'],
+        correct: 1
+      },
+      {
+        id: 12,
+        text: 'در عبارت «شب تاریک و روز روشن» کدام آرایه ادبی به کار رفته؟',
+        options: ['تشبیه', 'استعاره', 'کنایه', 'تضاد'],
+        correct: 3
+      },
+      {
+        id: 13,
+        text: 'فعل «بخوان» در چه زمانی است؟',
+        options: ['ماضی', 'مضارع', 'امر', 'مضارع التزامی'],
+        correct: 2
+      },
+      {
+        id: 14,
+        text: 'کدام گزینه متضاد «بخل» است؟',
+        options: ['سخاوت', 'خساست', 'حسد', 'تنبلی'],
+        correct: 0
+      },
+      {
+        id: 15,
+        text: 'درس چهارم «نیکی کن» بر کدام ارزش اخلاقی تأکید دارد؟',
+        options: ['جنگ و دفاع', 'احسان و نیکوکاری', 'علم و دانش', 'وطن‌دوستی'],
+        correct: 1
+      },
+      {
+        id: 16,
+        text: 'در جمله «بچه‌ها بازی می‌کنند» کلمه «بچه‌ها» چه نقشی دارد؟',
+        options: ['مفعول', 'فاعل', 'قید', 'مسند'],
+        correct: 1
+      },
+      {
+        id: 17,
+        text: 'کدام واژه مصدر است؟',
+        options: ['رفتار', 'رفتن', 'می‌رود', 'برو'],
+        correct: 1
+      },
+      {
+        id: 18,
+        text: 'در شعر «گر چه تلخ است این دوا خوش آمدت» منظور از «دوا» چیست؟',
+        options: ['دارو', 'پند و اندرز', 'بیماری', 'آب'],
+        correct: 1
+      },
+      {
+        id: 19,
+        text: 'کدام گزینه حرف اضافه است؟',
+        options: ['در', 'و', 'را', 'که'],
+        correct: 0
+      },
+      {
+        id: 20,
+        text: 'موضوع مشترک چهار درس نوبت اول چیست؟',
+        options: ['تاریخ ایران', 'اخلاق و ارزش‌های انسانی', 'علوم طبیعی', 'ریاضیات'],
+        correct: 1
+      }
+    ];
+
+    let currentView = 'home';
+    let userAnswers = new Array(questions.length).fill(null);
+    let testHistory = [];
+    let isSubmitting = false;
+
+    const dataHandler = {
+      onDataChanged(data) {
+        testHistory = data;
+        if (currentView === 'home') {
+          renderApp();
+        }
+      }
+    };
+
+    async function initializeApp() {
+      const initResult = await window.dataSdk.init(dataHandler);
+      if (!initResult.isOk) {
+        console.error('خطا در بارگذاری داده‌ها');
+      }
+    }
+
+    function generateTestId() {
+      return `test_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+
+    async function submitTest() {
+      if (isSubmitting) return;
+      
+      const unanswered = userAnswers.some(a => a === null);
+      if (unanswered) {
+        showToast('لطفاً به همه سوالات پاسخ دهید');
+        return;
+      }
+
+      if (testHistory.length >= 999) {
+        showToast('حداکثر تعداد آزمون‌ها (۹۹۹) ثبت شده است');
+        return;
+      }
+
+      isSubmitting = true;
+      renderApp();
+
+      const score = userAnswers.reduce((acc, answer, index) => {
+        return acc + (answer === questions[index].correct ? 1 : 0);
+      }, 0);
+
+      const testData = {
+        test_id: generateTestId(),
+        score: score,
+        total_questions: questions.length,
+        completed_at: new Date().toISOString(),
+        answers: JSON.stringify(userAnswers)
+      };
+
+      const createResult = await window.dataSdk.create(testData);
+      
+      isSubmitting = false;
+
+      if (createResult.isOk) {
+        currentView = 'results';
+        renderApp();
+      } else {
+        showToast('خطا در ثبت نتیجه آزمون');
+        renderApp();
+      }
+    }
+
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.textContent = message;
+      toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 50%;
+        transform: translateX(50%);
+        background: ${window.elementSdk?.config?.primary_action_color || defaultConfig.primary_action_color};
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        z-index: 1000;
+        font-size: ${(window.elementSdk?.config?.font_size || defaultConfig.font_size) * 0.9}px;
+      `;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    function startTest() {
+      currentView = 'test';
+      userAnswers = new Array(questions.length).fill(null);
+      renderApp();
+    }
+
+    function selectAnswer(questionIndex, optionIndex) {
+      userAnswers[questionIndex] = optionIndex;
+      renderApp();
+    }
+
+    function goHome() {
+      currentView = 'home';
+      renderApp();
+    }
+
+    async function onConfigChange(config) {
+      const app = document.getElementById('app');
+      if (!app) return;
+
+      const backgroundColor = config.background_color || defaultConfig.background_color;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action_color || defaultConfig.primary_action_color;
+      const secondaryColor = config.secondary_action_color || defaultConfig.secondary_action_color;
+      const fontFamily = config.font_family || defaultConfig.font_family;
+      const fontSize = config.font_size || defaultConfig.font_size;
+
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = textColor;
+      document.body.style.fontFamily = `${fontFamily}, Vazirmatn, sans-serif`;
+
+      const allText = app.querySelectorAll('*');
+      allText.forEach(el => {
+        el.style.color = textColor;
+        el.style.fontFamily = `${fontFamily}, Vazirmatn, sans-serif`;
+      });
+
+      const containers = app.querySelectorAll('.question-card, .history-card');
+      containers.forEach(el => {
+        el.style.backgroundColor = surfaceColor;
+      });
+
+      const primaryButtons = app.querySelectorAll('.primary-button');
+      primaryButtons.forEach(btn => {
+        btn.style.backgroundColor = primaryColor;
+      });
+
+      const secondaryButtons = app.querySelectorAll('.secondary-button');
+      secondaryButtons.forEach(btn => {
+        btn.style.backgroundColor = secondaryColor;
+      });
+
+      const titles = app.querySelectorAll('.title');
+      titles.forEach(el => {
+        el.style.fontSize = `${fontSize * 2}px`;
+      });
+
+      const subtitles = app.querySelectorAll('.subtitle');
+      subtitles.forEach(el => {
+        el.style.fontSize = `${fontSize * 1.5}px`;
+      });
+
+      const bodyText = app.querySelectorAll('.body-text');
+      bodyText.forEach(el => {
+        el.style.fontSize = `${fontSize}px`;
+      });
+
+      const smallText = app.querySelectorAll('.small-text');
+      smallText.forEach(el => {
+        el.style.fontSize = `${fontSize * 0.875}px`;
+      });
+
+      const buttons = app.querySelectorAll('button');
+      buttons.forEach(btn => {
+        btn.style.fontSize = `${fontSize}px`;
+      });
+    }
+
+    function renderApp() {
+      const config = window.elementSdk?.config || defaultConfig;
+      const backgroundColor = config.background_color || defaultConfig.background_color;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action_color || defaultConfig.primary_action_color;
+      const secondaryColor = config.secondary_action_color || defaultConfig.secondary_action_color;
+      const fontFamily = config.font_family || defaultConfig.font_family;
+      const fontSize = config.font_size || defaultConfig.font_size;
+
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.fontFamily = `${fontFamily}, Vazirmatn, sans-serif`;
+
+      const app = document.getElementById('app');
+
+      if (currentView === 'home') {
+        app.innerHTML = `
+          <div style="background-color: ${backgroundColor}; min-height: 100%; padding: 32px 16px;">
+            <div style="max-width: 800px; margin: 0 auto;">
+              <h1 class="title" style="font-size: ${fontSize * 2}px; font-weight: bold; text-align: center; margin-bottom: 8px; color: ${textColor}; font-family: ${fontFamily}, Vazirmatn, sans-serif;">
+                ${config.site_title || defaultConfig.site_title}
+              </h1>
+              <p class="body-text" style="font-size: ${fontSize}px; text-align: center; margin-bottom: 32px; color: ${textColor}; font-family: ${fontFamily}, Vazirmatn, sans-serif;">
+                ${config.welcome_message || defaultConfig.welcome_message}
+              </p>
+              
+              <div class="question-card" style="background-color: ${surfaceColor}; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 32px;">
+                <h2 class="subtitle" style="font-size: ${fontSize * 1.5}px; font-weight: 600; margin-bottom: 16px; color: ${textColor}; font-family: ${fontFamily}, Vazirmatn, sans-serif;">
+                  📝 درباره آزمون
+                </h2>
+                <div class="body-text" style="font-size: ${fontSize}px; color: ${textColor}; font-family: ${fontFamily}, Vazirmatn, sans-serif; line-height: 1.6;">
+                  <p style="margin-bottom: 12px;">• تعداد سوالات: ${questions.length} سوال</p>
+                  <p style="margin-bottom: 12px;">• دروس: آیینه‌ی دار، ای وای اگر، قدر دانستن، نیکی کن</p>
+                  <p style="margin-bottom: 12px;">• موضوعات: دستور زبان، آرایه‌های ادبی، واژگان</p>
+                  <p style="margin-bottom: 24px;">• زمان: نامحدود</p>
+                  <button onclick="startTest()" class="primary-button option-button" style="background-color: ${primaryColor}; color: white; width: 100%; padding: 16px; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; font-size: ${fontSize}px; font-family: ${fontFamily}, Vazirmatn, sans-serif;">
+                    ${config.start_button || defaultConfig.start_button}
+                  </button>
+                </div>
+              </div>
+
+              ${testHistory.length > 0 ? `
+                <div class="question-card" style="background-color: ${surfaceColor}; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                  <h2 class="subtitle" style="font-size: ${fontSize * 1.5}px; font-weight: 600; margin-bottom: 16px; color: ${textColor}; font-family: ${fontFamily}, Vazirmatn, sans-serif;">
+                    📊 تاریخچه آزمون‌ها
+                  </h2>
+                  <div style="display: grid; gap: 12px;">
+                    ${testHistory.slice(-5).reverse().map(test => {
+                      const date = new Date(test.completed_at);
+                      const percentage = Math.round((test.score / test.total_questions) * 100);
+                      return `
+                        <div class="history-card" style="background-color: ${backgroundColor}; padding: 16px; border-radius: 8px;">
+                          <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                              <p class="body-text" style="font-size: ${fontSize}px; font-weight: 600; margin-bottom: 4px; color: ${textColor}; font-family: ${fontFamily}, Vazirmatn, sans-serif;">
+                                نمره: ${test.score} از ${test.total_questions} (${percentage}٪)
+                              </p>
+                              <p class="small-text" style="font-size: ${fontSize * 0.875}px; color: ${textColor}; opacity: 0.7; font-family: ${fontFamily}, Vazirmatn, sans-serif;">
+                                ${date.toLocaleDateString('fa-IR')} - ${date.toLocaleTimeString('fa-IR', {hour: '2-digit', minute: '2-digit'})}
+                              </p>
+                            </div>
+                            <div style="font-size: ${fontSize * 1.5}px;">
+                              ${percentage >= 80 ? '🏆' : percentage >= 60 ? '👍' : '📚'}
+                            </div>
+                          </div>
+                        </div>
+                      `;
+                    }).join('')}
+                  </div>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      } else if (currentView === 'test') {
+        app.innerHTML = `
+          <div style="background-color: ${backgroundColor}; min-height: 100%; padding: 32px 16px;">
+            <div style="max-width: 800px; margin: 0 auto;">
+              <h1 class="title" style="font-size: ${fontSize * 2}px; font-weight: bold; text-align: center; margin-bottom: 32px; color: ${textColor}; font-family: ${fontFamily}, Vazirmatn, sans-serif;">
+                آزمون در حال انجام
+              </h1>
+              
+              <div style="display: grid; gap: 24px;">
+                ${questions.map((q, qIndex) => `
+                  <div class="question-card" style="background-color: ${surfaceColor}; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <h3 class="subtitle" style="font-size: ${fontSize * 1.25}px; font-weight: 600; margin-bottom: 16px; color: ${textColor}; font-family: ${fontFamily}, Vazirmatn, sans-serif;">
+                      ${qIndex + 1}. ${q.text}
+                    </h3>
+                    <div style="display: grid; gap: 12px;">
+                      ${q.options.map((option, oIndex) => `
+                        <button 
+                          onclick="selectAnswer(${qIndex}, ${oIndex})"
+                          class="option-button ${userAnswers[qIndex] === oIndex ? 'secondary-button' : ''}"
+                          style="background-color: ${userAnswers[qIndex] === oIndex ? secondaryColor : backgroundColor}; 
+                                 color: ${userAnswers[qIndex] === oIndex ? 'white' : textColor};
+                                 padding: 16px; 
+                                 border-radius: 8px; 
+                                 text-align: right; 
+                                 border: 2px solid ${userAnswers[qIndex] === oIndex ? secondaryColor : 'transparent'}; 
+                                 cursor: pointer;
+                                 font-size: ${fontSize}px;
+                                 font-family: ${fontFamily}, Vazirmatn, sans-serif;">
+                          ${option}
+                        </button>
+                      `).join('')}
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+
+              <div style="margin-top: 32px; display: flex; gap: 12px; justify-content: center;">
+                <button 
+                  onclick="goHome()"
+                  style="background-color: ${backgroundColor}; 
+                         color: ${textColor}; 
+                         padding: 16px 32px; 
+                         border-radius: 8px; 
+                         font-weight: 600; 
+                         border: 2px solid ${textColor}; 
+                         cursor: pointer;
+                         font-size: ${fontSize}px;
+                         font-family: ${fontFamily}, Vazirmatn, sans-serif;">
+                  بازگشت
+                </button>
+                <button 
+                  onclick="submitTest()"
+                  class="primary-button option-button"
+                  ${isSubmitting ? 'disabled' : ''}
+                  style="background-color: ${primaryColor}; 
+                         color: white; 
+                         padding: 16px 32px; 
+                         border-radius: 8px; 
+                         font-weight: 600; 
+                         border: none; 
+                         cursor: ${isSubmitting ? 'not-allowed' : 'pointer'};
+                         opacity: ${isSubmitting ? '0.6' : '1'};
+                         font-size: ${fontSize}px;
+                         font-family: ${fontFamily}, Vazirmatn, sans-serif;">
+                  ${isSubmitting ? 'در حال ثبت...' : (config.submit_button || defaultConfig.submit_button)}
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (currentView === 'results') {
+        const score = userAnswers.reduce((acc, answer, index) => {
+          return acc + (answer === questions[index].correct ? 1 : 0);
+        }, 0);
+        const percentage = Math.round((score / questions.length) * 100);
+
+        app.innerHTML = `
+          <div style="background-color: ${backgroundColor}; min-height: 100%; padding: 32px 16px;">
+            <div style="max-width: 800px; margin: 0 auto;">
+              <div class="question-card" style="background-color: ${surfaceColor}; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 32px; text-align: center;">
+                <div style="font-size: ${fontSize * 4}px; margin-bottom: 16px;">
+                  ${percentage >= 80 ? '🎉' : percentage >= 60 ? '👍' : '💪'}
+                </div>
+                <h1 class="title" style="font-size: ${fontSize * 2}px; font-weight: bold; margin-bottom: 8px; color: ${textColor}; font-family: ${fontFamily}, Vazirmatn, sans-serif;">
+                  نتیجه آزمون
+                </h1>
+                <p class="subtitle" style="font-size: ${fontSize * 2}px; font-weight: bold; color: ${primaryColor}; margin-bottom: 8px; font-family: ${fontFamily}, Vazirmatn, sans-serif;">
+                  ${score} از ${questions.length}
+                </p>
+                <p class="body-text" style="font-size: ${fontSize * 1.25}px; color: ${textColor}; font-family: ${fontFamily}, Vazirmatn, sans-serif;">
+                  ${percentage}٪ پاسخ صحیح
+                </p>
+              </div>
+
+              <div style="display: grid; gap: 24px; margin-bottom: 32px;">
+                ${questions.map((q, qIndex) => {
+                  const userAnswer = userAnswers[qIndex];
+                  const isCorrect = userAnswer === q.correct;
+                  return `
+                    <div class="question-card ${isCorrect ? 'correct' : 'incorrect'}" style="background-color: ${surfaceColor}; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-right: 4px solid ${isCorrect ? secondaryColor : '#ef4444'};">
+                      <div style="display: flex; align-items: start; gap: 12px; margin-bottom: 16px;">
+                        <span style="font-size: ${fontSize * 1.5}px;">${isCorrect ? '✅' : '❌'}</span>
+                        <h3 class="subtitle" style="font-size: ${fontSize * 1.25}px; font-weight: 600; color: ${textColor}; font-family: ${fontFamily}, Vazirmatn, sans-serif;">
+                          ${qIndex + 1}. ${q.text}
+                        </h3>
+                      </div>
+                      <div style="display: grid; gap: 8px;">
+                        ${q.options.map((option, oIndex) => {
+                          let bgColor = backgroundColor;
+                          let txtColor = textColor;
+                          let borderColor = 'transparent';
+                          
+                          if (oIndex === q.correct) {
+                            bgColor = secondaryColor;
+                            txtColor = 'white';
+                          } else if (oIndex === userAnswer && !isCorrect) {
+                            bgColor = '#fee2e2';
+                            borderColor = '#ef4444';
+                          }
+                          
+                          return `
+                            <div style="background-color: ${bgColor}; 
+                                        color: ${txtColor}; 
+                                        padding: 12px 16px; 
+                                        border-radius: 8px; 
+                                        border: 2px solid ${borderColor};
+                                        font-size: ${fontSize}px;
+                                        font-family: ${fontFamily}, Vazirmatn, sans-serif;">
+                              ${option} ${oIndex === q.correct ? '✓' : ''}
+                            </div>
+                          `;
+                        }).join('')}
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+
+              <div style="display: flex; gap: 12px; justify-content: center;">
+                <button 
+                  onclick="goHome()"
+                  style="background-color: ${backgroundColor}; 
+                         color: ${textColor}; 
+                         padding: 16px 32px; 
+                         border-radius: 8px; 
+                         font-weight: 600; 
+                         border: 2px solid ${textColor}; 
+                         cursor: pointer;
+                         font-size: ${fontSize}px;
+                         font-family: ${fontFamily}, Vazirmatn, sans-serif;">
+                  بازگشت به خانه
+                </button>
+                <button 
+                  onclick="startTest()"
+                  class="primary-button option-button"
+                  style="background-color: ${primaryColor}; 
+                         color: white; 
+                         padding: 16px 32px; 
+                         border-radius: 8px; 
+                         font-weight: 600; 
+                         border: none; 
+                         cursor: pointer;
+                         font-size: ${fontSize}px;
+                         font-family: ${fontFamily}, Vazirmatn, sans-serif;">
+                  ${config.retry_button || defaultConfig.retry_button}
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    window.elementSdk.init({
+      defaultConfig,
+      onConfigChange,
+      mapToCapabilities: (config) => ({
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => {
+              config.background_color = value;
+              window.elementSdk.setConfig({ background_color: value });
+            }
+          },
+          {
+            get: () => config.surface_color || defaultConfig.surface_color,
+            set: (value) => {
+              config.surface_color = value;
+              window.elementSdk.setConfig({ surface_color: value });
+            }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => {
+              config.text_color = value;
+              window.elementSdk.setConfig({ text_color: value });
+            }
+          },
+          {
+            get: () => config.primary_action_color || defaultConfig.primary_action_color,
+            set: (value) => {
+              config.primary_action_color = value;
+              window.elementSdk.setConfig({ primary_action_color: value });
+            }
+          },
+          {
+            get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+            set: (value) => {
+              config.secondary_action_color = value;
+              window.elementSdk.setConfig({ secondary_action_color: value });
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => config.font_family || defaultConfig.font_family,
+          set: (value) => {
+            config.font_family = value;
+            window.elementSdk.setConfig({ font_family: value });
+          }
+        },
+        fontSizeable: {
+          get: () => config.font_size || defaultConfig.font_size,
+          set: (value) => {
+            config.font_size = value;
+            window.elementSdk.setConfig({ font_size: value });
+          }
+        }
+      }),
+      mapToEditPanelValues: (config) => new Map([
+        ['site_title', config.site_title || defaultConfig.site_title],
+        ['welcome_message', config.welcome_message || defaultConfig.welcome_message],
+        ['start_button', config.start_button || defaultConfig.start_button],
+        ['submit_button', config.submit_button || defaultConfig.submit_button],
+        ['retry_button', config.retry_button || defaultConfig.retry_button]
+      ])
+    });
+
+    initializeApp().then(() => {
+      renderApp();
+    });
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9b29f6a8e30dd821',t:'MTc2NjUxNDk3Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
